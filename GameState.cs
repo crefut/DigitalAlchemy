@@ -8,6 +8,10 @@ using UnityEngine.UI;
 
 public class GameState : MonoBehaviour
 {
+    /*
+     * Класс, хранящий информацию о текущем состоянии игры. Отвечает за работу с сохранениями и за поведение
+     * пользовательского интерфейса при различных действиях пользователя.
+     */
     public List<Item> selectedItems;
     public List<int> openedElements;
     public GameObject numOfUnlockedElements;
@@ -25,6 +29,7 @@ public class GameState : MonoBehaviour
     public bool descriptionModeIsActive;
     public bool gameIsOver;
     
+    // Проверяет наличие сохранений при запуске игры и восстанавливает игровое состояние 
     void Start()
     {
         if (PlayerPrefs.HasKey("isNewGame") && PlayerPrefs.GetString("isNewGame") == "false")
@@ -44,13 +49,14 @@ public class GameState : MonoBehaviour
         UpdateNumOfUnlockedElements();
     }
     
-
+    // Обновляет надпись, показывающую количество открытых элементов
     public void UpdateNumOfUnlockedElements()
     {
         numOfUnlockedElements.GetComponent<Text>().text = String.Format("Открыто элементов: {0}/{1}",
             openedElements.Count, GameObject.FindGameObjectsWithTag("Item").Length);
     }
 
+    // Функция сочетания элементов
     public void CombineItems()
     {
         var intersection = selectedItems[0].furtherItems;
@@ -70,6 +76,7 @@ public class GameState : MonoBehaviour
         ClearSelection();
     }
 
+    // Отменяет выбор ранее выбранных элементов
     public void ClearSelection()
     {
         foreach (var item in selectedItems)
@@ -77,6 +84,7 @@ public class GameState : MonoBehaviour
         selectedItems = new List<Item>();
     }
 
+    // Включает режим показа описаний элементов
     public void ShowItemDescription()
     {
         showDescriptionButton.GetComponent<Image>().color = descriptionModeIsActive ?
@@ -84,6 +92,7 @@ public class GameState : MonoBehaviour
         descriptionModeIsActive = !descriptionModeIsActive;
     }
 
+    // Показывает окно с описанием элемента
     public void ShowWindow(GameObject item)
     {
         scrollView.GetComponent<ScrollRect>().horizontal = false;
@@ -99,12 +108,13 @@ public class GameState : MonoBehaviour
         StartCoroutine(FadeIn());
     }
 
+    // Скрывает окно с описанием элемента
     public void CloseWindow()
     {
-        Debug.Log(123213);
         StartCoroutine(FadeOut());
     }
 
+    // Анимация всплывания окна с описание элемента
     public IEnumerator FadeIn()
     {
         blackoutWindow.SetActive(true);
@@ -116,6 +126,7 @@ public class GameState : MonoBehaviour
         }
     }
 
+    // Анимация ухода окна с описание элемента
     public IEnumerator FadeOut()
     {
         scrollView.GetComponent<ScrollRect>().horizontal = true;
@@ -134,6 +145,7 @@ public class GameState : MonoBehaviour
             StartCoroutine(FinishGame());
     }
 
+    // Отвечает за анимацию конца игры
     private IEnumerator FinishGame()
     {
         endGameImage.SetActive(true);
@@ -160,6 +172,7 @@ public class GameState : MonoBehaviour
         }
     }
 
+    // Изменяет прозрачность окна с описанием элемента
     private void ChangeDescriptionWindowColor(float transparency)
     {
         if (transparency <= 0.5f)
@@ -171,6 +184,7 @@ public class GameState : MonoBehaviour
             text.color = new Color(text.color.r, text.color.g, text.color.b, transparency);
     }
 
+    // Изменяет текст окна с описанием элемента, ссылку на веб-ресурс и иконку элемента
     public void ChangeDescriptionWindowTextAndIcons(string title, string description, string webLink, Sprite icon)
     {
         foreach (var text in descriptionWindow.GetComponentsInChildren<Text>())
@@ -182,6 +196,7 @@ public class GameState : MonoBehaviour
         elementWebInfo.GetComponent<WebLink>().url = webLink;
     }
 
+    // Загружает главное меню
     public void LoadMainMenu()
     {
         SceneManager.LoadSceneAsync("MainMenu");
