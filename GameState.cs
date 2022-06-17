@@ -65,13 +65,12 @@ public class GameState : MonoBehaviour
 
         foreach (var nextItem in intersection)
         {
-            if (nextItem.GetComponent<Item>().components.Length == selectedItems.Count)
-            {
-                nextItem.GetComponent<Item>().Unlock(true);
-                ClearSelection();
-                UpdateNumOfUnlockedElements();
-                break;
-            }
+            if (nextItem.GetComponent<Item>().components.Length != selectedItems.Count)
+                continue;
+            nextItem.GetComponent<Item>().Unlock(true);
+            ClearSelection();
+            UpdateNumOfUnlockedElements();
+            break;
         }
         ClearSelection();
     }
@@ -121,7 +120,7 @@ public class GameState : MonoBehaviour
         descriptionWindow.SetActive(true);
         for (var transparency = 0f; transparency <= 1; transparency += Time.deltaTime * 2f)
         {
-            ChangeDescriptionWindowColor(transparency);
+            descriptionWindow.GetComponent<CanvasGroup>().alpha = transparency;
             yield return null;
         }
     }
@@ -134,7 +133,7 @@ public class GameState : MonoBehaviour
         showDescriptionButton.GetComponent<Image>().color = new Color(1f, 1f, 1f, 1f);
         for (var transparency = 1f; transparency >= 0; transparency -= Time.deltaTime * 2f)
         {
-            ChangeDescriptionWindowColor(transparency);
+            descriptionWindow.GetComponent<CanvasGroup>().alpha = transparency;
             yield return null;
         }
         var scrollbarPos = descriptionWindowText.transform.position;
@@ -172,25 +171,11 @@ public class GameState : MonoBehaviour
         }
     }
 
-    // Изменяет прозрачность окна с описанием элемента
-    private void ChangeDescriptionWindowColor(float transparency)
-    {
-        if (transparency <= 0.5f)
-            blackoutWindow.GetComponent<Image>().color = new Color(0, 0, 0, transparency);
-        descriptionWindow.GetComponent<Image>().color = new Color(1, 1, 1, transparency);
-        elementIcon.GetComponent<Image>().color = new Color(1, 1, 1, transparency);
-        elementWebInfo.GetComponent<Image>().color = new Color(1, 1, 1, transparency);
-        foreach (var text in descriptionWindow.GetComponentsInChildren<Text>())
-            text.color = new Color(text.color.r, text.color.g, text.color.b, transparency);
-    }
-
     // Изменяет текст окна с описанием элемента, ссылку на веб-ресурс и иконку элемента
     public void ChangeDescriptionWindowTextAndIcons(string title, string description, string webLink, Sprite icon)
     {
         foreach (var text in descriptionWindow.GetComponentsInChildren<Text>())
-        {
             text.text = text.gameObject.name == "Name" ? title : description + "\n\n\n\n";
-        }
 
         elementIcon.GetComponent<Image>().sprite = icon;
         elementWebInfo.GetComponent<WebLink>().url = webLink;
